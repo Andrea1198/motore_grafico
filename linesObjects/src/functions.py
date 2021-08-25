@@ -1,3 +1,4 @@
+# Lines class, it has points, angolar coefficient and q of the line in case they are needed
 class Line:
     def __init__(self, x1_, y1_, x2_, y2_):
         import sys
@@ -22,15 +23,15 @@ class Line:
         white = (255, 255, 255)
         pygame.draw.line(screen, white, (self.x1, self.y1), (self.x2, self.y2))
 
-# class Ray:
-#
 
+# class of Boxes in case you want to use boxes instead of lines
 class Box:
     def __init__(self, l1_, l2_, l3_, l4_):
         self.l1 = l1_
         self.l2 = l2_
         self.l3 = l3_
         self.l4 = l4_
+        # calculation for surface sizes
         self.edges = [self.l1, self.l2, self.l3, self.l4]
         self.minx  = min(self.l1.x1, self.l2.x1, self.l3.x1, self.l4.x1)
         self.minx  = min(self.minx, self.l1.x2, self.l2.x2, self.l3.x2, self.l4.x2)
@@ -47,7 +48,7 @@ class Box:
         for l in self.edges:
             pygame.draw.line(screen, white, (l.x1, l.y1), (l.x2, l.y2))
 
-
+# Function to check if there is an intersection between 2 lines
 def check_intersection(l1, l2):
     x1 = l1.x1
     x2 = l1.x2
@@ -59,17 +60,19 @@ def check_intersection(l1, l2):
     y4 = l2.y2
 
     den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-    if den == 0:
+    if den == 0:                        # Parallel lines
         return (x4, y4)
     t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4))/den
     u =-((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))/den
-    if t > 0 and t < 1 and u > 0:
+
+    if t > 0 and t < 1 and u > 0:       # There's intersection
         x = x1 + t * (x2 - x1)
         y = y1 + t * (y2 - y1)
         return (x, y)
-    else:
+    else:                               # Out of boundaries of the lines
         return (x4, y4)
 
+# Caluclate the distance between two points
 def check_dist(x1, x2, y1, y2):
     from numpy import sqrt
     dist = (x2-x1)**2 + (y2-y1)**2
@@ -106,6 +109,7 @@ def start():
                 l.show(screen)
         pygame.display.update()
 
+# This works
 def tr():
     import pygame
     import sys
