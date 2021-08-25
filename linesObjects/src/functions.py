@@ -1,5 +1,6 @@
 class Line:
     def __init__(self, x1_, y1_, x2_, y2_):
+        import sys
         from math import atan
         self.x1 = x1_
         self.y1 = y1_
@@ -7,10 +8,13 @@ class Line:
         self.y2 = y2_
         y21 = self.y2-self.y1
         x21 = self.x2-self.x1
-        if y21*x21 > 0:
-            self.m  = atan(y21/x21)
+        if x21 != 0:
+            if y21*x21 > 0:
+                self.m  = atan(y21/x21)
+            else:
+                self.m  = -atan(y21/x21)
         else:
-            self.m  = -atan(y21/x21)
+            self.m = sys.max_int
         self.q = self.y2 - self.m*self.x2
 
     def show(self, screen):
@@ -18,6 +22,8 @@ class Line:
         white = (255, 255, 255)
         pygame.draw.line(screen, white, (self.x1, self.y1), (self.x2, self.y2))
 
+# class Ray:
+#
 
 class Box:
     def __init__(self, l1_, l2_, l3_, l4_):
@@ -43,22 +49,32 @@ class Box:
 
 
 def check_intersection(l1, l2):
-    m1 = l1.m
-    m2 = l2.m
-    q1 = l1.q
-    q2 = l2.q
-    if m1 == m2:
-        return (l2.x2, l2.y2)
-    x = (q2-q1) / (m1-m2)
-    y = m1*x + q1
-    if ((l1.x1 < x and l1.x2 < x) or (l1.x1 > x and l1.x2 > x)):
-        return (l2.x2, l2.y2)
-    # if ((l2.x1 < x and l2.x2 < x) or (l2.x1 > x and l2.x2 > x)):
-    #     return (l2.x2, l2.y2)
+    x1 = l1.x1
+    x2 = l1.x2
+    x3 = l2.x1
+    x4 = l2.x2
+    y1 = l1.y1
+    y2 = l1.y2
+    y3 = l2.y1
+    y4 = l2.y2
 
-    if ((l1.y1 < y and l1.y2 < y) or (l1.y1 > y and l1.y2 > y)):
-        return (l2.x2, l2.y2)
-    return (x, y)
+    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if den == 0:
+        return (x4, y4)
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4))/den
+    u =-((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))/den
+    if t > 0 and t < 1 and u > 0:
+        x = x1 + t * (x2 - x1)
+        y = y1 + t * (y2 - y1)
+        return (x, y)
+    else:
+        return (x4, y4)
+
+def check_dist(x1, x2, y1, y2):
+    from numpy import sqrt
+    dist = (x2-x1)**2 + (y2-y1)**2
+    dist = sqrt(dist)
+    return dist
 
 def start():
     import pygame
@@ -92,10 +108,13 @@ def start():
 
 def tr():
     import pygame
+    import sys
+    from pygame.time import delay
+    from random import randint
     from numpy import pi, cos, sin, sqrt
     black = (  0,  0,  0)
     white = (255,255,255)
-    n = 20
+    n = 200
     delta = pi/n*2
     pygame.init()
     WIDTH  = 800
@@ -104,20 +123,31 @@ def tr():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Lines")
     running = True
-    l = Line(200,300,400,360)
-    print(l.m, l.q)
+    nObstacles = 5
+    obstacles = [Line(randint(0,WIDTH),randint(0,HEIGHT),randint(0,WIDTH),randint(0,HEIGHT)) for i in range(nObstacles)]
     while running:
         window = pygame.Surface((WIDTH, HEIGHT))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             else:
+                screen.fill(0)
                 (xMouse, yMouse) = pygame.mouse.get_pos()
-                for i in range(1, 2):
+                # (xMouse, yMouse) = (200,330)
+                for i in range(n):
+                    x = xMouse + r*cos(delta*i)
+                    y = yMouse + r*sin(delta*i)
                     ll  = Line(xMouse, yMouse, xMouse + r*cos(delta*i), yMouse + r*sin(delta*i))
-                    print(ll.m, ll.q)
-                    (x, y) = check_intersection(l, ll)
-                    pygame.draw.line(window, white, (xMouse, yMouse), (x, y))
-                screen.blit(window, (0,0))
-                l.show(screen)
+                    minDist = r
+                    indexDist = -1
+                    for i, l in enumerate(obstacles):
+                        (x1, y1) = check_intersection(l, ll)
+                        dist = check_dist(xMouse, x1, yMouse, y1)
+                        if dist < minDist:
+                            minDist = dist
+                            indexDist = i
+                            (x, y) = (x1, y1)
+                        pygame.draw.line(screen, white, (l.x1, l.y1), (l.x2, l.y2))
+                    pygame.draw.line(screen, white, (xMouse, yMouse), (x, y))
+
         pygame.display.update()
