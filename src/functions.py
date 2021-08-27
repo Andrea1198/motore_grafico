@@ -11,10 +11,13 @@ class Line:
         x21 = self.x2-self.x1
         if x21 != 0:
             self.m  = y21/x21
+<<<<<<< HEAD:src/functions.py
             if y21*x21 > 0:
                 self.a  = atan(self.m)
             else:
                 self.a  = -atan(self.m)
+=======
+>>>>>>> bfbe2b97a54c0a7f276f64a2eb44d2665acdd4dc:linesObjects/src/functions.py
         else:
             self.m = 1e6
         self.q = self.y2 - self.m*self.x2
