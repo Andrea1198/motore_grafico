@@ -1,3 +1,3 @@
-from src.functions import tr
-
+from src import tr
 tr()
+
