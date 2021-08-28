@@ -221,14 +221,14 @@ def tr():
     yPlayer     = HEIGHT/2
     nObstacles  = 10
     nBoxes      = 0
-    nRays       = 300
+    nRays       = 100
     deltaX      = WIDTH/2/nRays
-    delta       = pi/nRays/2
     movementX   = 0
     r           = max(WIDTH/2, HEIGHT)*sqrt(2)
     obstacles   = generateObstacles(WIDTH, HEIGHT, nObstacles)
     distances   = [max(WIDTH/2, HEIGHT) for i in range(nRays)]
     boxes       = generateBoxes(WIDTH, HEIGHT, nBoxes)
+    fov     = pi
 
     # Running
     running     = True
@@ -239,6 +239,11 @@ def tr():
                 running = False
             (movementX, movementY) = check_key()
 
+        if pygame.key.get_pressed()[pygame.K_u]:
+            fov += 0.1
+        elif pygame.key.get_pressed()[pygame.K_l]:
+            fov -= 0.1
+        delta   = fov/nRays
         screen.fill(0)
         xPlayer    += movementY*cos(direction)*velocity
         yPlayer    += movementY*sin(direction)*velocity
