@@ -228,7 +228,7 @@ def tr():
     obstacles   = generateObstacles(WIDTH, HEIGHT, nObstacles)
     distances   = [max(WIDTH/2, HEIGHT) for i in range(nRays)]
     boxes       = generateBoxes(WIDTH, HEIGHT, nBoxes)
-    fov     = pi
+    fov         = pi
 
     # Running
     running     = True
